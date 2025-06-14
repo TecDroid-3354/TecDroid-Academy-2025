@@ -1,10 +1,6 @@
-package org.firstinspires.ftc.teamcode.drivetrain
+package org.firstinspires.ftc.teamcode.Drivetrain
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.qualcomm.robotcore.hardware.HardwareMap
-import com.seattlesolvers.solverslib.controller.PIDController
-import com.seattlesolvers.solverslib.hardware.motors.Motor
-import org.firstinspires.ftc.teamcode.utils.PIDCoefficients
 
 data class TankConfig(
     val leftDriveDeviceName: String,

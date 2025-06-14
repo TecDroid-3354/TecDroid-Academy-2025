@@ -27,26 +27,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drivetrain;
-
-import static org.firstinspires.ftc.teamcode.drivetrain.TankConfigKt.getTankConfig;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
-import com.seattlesolvers.solverslib.command.Subsystem;
+import com.seattlesolvers.solverslib.command.button.GamepadButton;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.drivetrain.TankConfigKt.*;
+import org.firstinspires.ftc.teamcode.Drivetrain.TankConfigKt;
+import org.firstinspires.ftc.teamcode.Drivetrain.TankDrive;
 
-import java.util.Collections;
-import java.util.Set;
-
-import kotlin.jvm.internal.Intrinsics;
+import org.firstinspires.ftc.teamcode.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Intake.IntakeConfigKt;
 
 
 /*
@@ -64,12 +61,41 @@ import kotlin.jvm.internal.Intrinsics;
 
 @TeleOp(name="TankDrive OpMode", group="Linear OpMode")
 @Disabled
-public class OpMode extends LinearOpMode {
+public class OpMode extends CommandOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
 
-    private final TankDrive tankDrive = new TankDrive(TankConfigKt.getTankConfig(), hardwareMap);
+    private TankDrive tankDrive;
+
+    private Intake intake;
+
+    private GamepadEx gamePad;
+
+    @Override
+    public void initialize() {
+        tankDrive = new TankDrive(TankConfigKt.getTankConfig(), hardwareMap);
+
+        intake  = new Intake(IntakeConfigKt.getGripperConfig(), hardwareMap);
+
+        gamePad = new GamepadEx(gamepad1);
+
+        configureButtonBindings();
+    }
+
+    public void configureButtonBindings() {
+
+        new GamepadButton(gamePad, GamepadKeys.Button.A)
+                .whenPressed(new InstantCommand(
+                        intake::runIntake
+                ));
+
+        new GamepadButton(gamePad, GamepadKeys.Button.B)
+                .whenPressed(new InstantCommand(
+                       intake::runOutTake
+                        ));
+
+    }
 
     @Override
     public void runOpMode() {
@@ -92,6 +118,7 @@ public class OpMode extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", tankDrive.getLeftPower(), tankDrive.getRightPower());
+            telemetry.addData("Intake", "Output: " + intake.getPower());
             telemetry.update();
         }
     }
