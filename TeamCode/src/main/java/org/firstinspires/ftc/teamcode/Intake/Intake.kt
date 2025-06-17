@@ -28,6 +28,10 @@ class Intake (private val config: IntakeConfig, val hardwareMap: HardwareMap): S
     fun runOutTake() {
         servo.power = -1.0
     }
+    
+    fun stopIntake() {
+        servo.power = 0.0
+    }
 
     init {
         configureServo()

@@ -4,6 +4,7 @@ import androidx.core.math.MathUtils
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import com.seattlesolvers.solverslib.hardware.motors.Motor
 
 /**
  * Creates a tank drive class which holds the necessary functions that may be needed in this subsystem
@@ -12,8 +13,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase
 class TankDrive (private val config: TankConfig, private val hardwareMap: HardwareMap) : SubsystemBase() {
 
 
-    private lateinit var rightDrive: DcMotor
-    private lateinit var leftDrive: DcMotor
+    private lateinit var rightDrive: Motor
+    private lateinit var leftDrive: Motor
 
     /**
      * Creates a function named drive that does the tank drive logic by applying the same linear power to
@@ -27,19 +28,19 @@ class TankDrive (private val config: TankConfig, private val hardwareMap: Hardwa
         val leftPower = MathUtils.clamp(drive + turn, -1.0, 1.0 )
         val rightPower = MathUtils.clamp(drive - turn, -1.0, 1.0 )
 
-        leftDrive.power = leftPower
-        rightDrive.power = rightPower
+        leftDrive.set(leftPower)
+        rightDrive.set(rightPower)
     }
 
     /**
      * Gets the power that is being passed to the left motor
      */
-    fun getLeftPower() = leftDrive.power
+    fun getLeftPower() = leftDrive.get()
 
     /**
      * Gets the power that is being passed to the right motor
      */
-    fun getRightPower() = rightDrive.power
+    fun getRightPower() = rightDrive.get()
 
     init {
         configureDcMotors()
@@ -53,11 +54,11 @@ class TankDrive (private val config: TankConfig, private val hardwareMap: Hardwa
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        rightDrive = hardwareMap.get(DcMotor::class.java, config.rightDriveDeviceName)
-        leftDrive = hardwareMap.get(DcMotor::class.java, config.leftDriveDeviceName)
-
-        rightDrive.direction = config.rightDirection
-        leftDrive.direction = config.leftDirection
+        rightDrive = Motor(hardwareMap, config.rightDriveDeviceName, config.motorType)
+        leftDrive = Motor(hardwareMap, config.leftDriveDeviceName, config.motorType)
+        
+        rightDrive.motor.direction = config.rightDirection
+        leftDrive.motor.direction = config.leftDirection
 
     }
 

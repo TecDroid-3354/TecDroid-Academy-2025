@@ -8,7 +8,7 @@ data class IntakeConfig (
     val servoDirection: DcMotorSimple.Direction,
 )
 
-val gripperConfig = IntakeConfig (
+val intakeConfig = IntakeConfig (
     servoId = "gripperServo", // Check the set name in the driver station
     servoDirection = DcMotorSimple.Direction.FORWARD, //Check the actual direction
 )
