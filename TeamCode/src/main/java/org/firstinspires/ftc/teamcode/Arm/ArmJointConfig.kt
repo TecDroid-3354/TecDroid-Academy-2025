@@ -5,7 +5,7 @@ import com.seattlesolvers.solverslib.controller.PIDController
 import org.firstinspires.ftc.teamcode.utils.Reduction
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 
-data class JointConfig(
+data class ArmJointConfig(
     val motorId: String,
     val motorType: Motor.GoBILDA,
     val motorDirection: DcMotorSimple.Direction,
@@ -17,7 +17,7 @@ data class JointConfig(
     val runMode: Motor.RunMode
 )
 
-val bottomJointConfig = JointConfig(
+val bottomJointConfig = ArmJointConfig(
     motorId = "bottomLinkMotor",
     motorType = Motor.GoBILDA.RPM_1150,
     motorDirection = DcMotorSimple.Direction.FORWARD,
@@ -29,7 +29,7 @@ val bottomJointConfig = JointConfig(
     runMode = Motor.RunMode.PositionControl
 )
 
-val upperJointConfig = JointConfig(
+val upperJointConfig = ArmJointConfig(
     motorId = "upperLinkMotor",
     motorType = Motor.GoBILDA.RPM_1150,
     motorDirection = DcMotorSimple.Direction.REVERSE,

@@ -4,13 +4,15 @@ import androidx.core.math.MathUtils
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.motors.Motor
-import org.firstinspires.ftc.ulateamcode.Arm.JointConfig
+import org.firstinspires.ftc.ulateamcode.Arm.ArmJointConfig
 
-class ArmJoint(private val config: JointConfig, private val hardwareMap: HardwareMap) : SubsystemBase() {
+class ArmJoint(private val config: ArmJointConfig, private val hardwareMap: HardwareMap) : SubsystemBase() {
 
     private lateinit var jointMotorController: Motor
 
-    private val motorPosition: Double = jointMotorController.currentPosition.toDouble()
+    private val motorEncoder: Motor.Encoder = jointMotorController.encoder
+
+    private val motorPosition: Double = motorEncoder.position.toDouble()
 
     fun getJointPosition() = config.gearRatio.apply(motorPosition)
 
@@ -20,10 +22,13 @@ class ArmJoint(private val config: JointConfig, private val hardwareMap: Hardwar
     }
 
     init {
-        configureMotors()
+        motorEncoder.reset()
+        configureMotor()
     }
 
-    private fun configureMotors() {
+    private fun configureMotor() {
+
+        jointMotorController.resetEncoder()
 
         jointMotorController = Motor(hardwareMap, config.motorId, config.motorType)
 

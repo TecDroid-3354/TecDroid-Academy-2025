@@ -1,16 +1,46 @@
 package org.firstinspires.ftc.teamcode.Arm
 
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import org.firstinspires.ftc.teamcode.Intake.Intake
-import org.firstinspires.ftc.teamcode.Intake.IntakeConfig
-import org.firstinspires.ftc.ulateamcode.Arm.JointConfig
 import org.firstinspires.ftc.teamcode.Arm.ArmMember.UpperJoint
 import org.firstinspires.ftc.teamcode.Arm.ArmMember.BottomJoint
 import org.firstinspires.ftc.teamcode.Arm.ArmOrders.UB
 import org.firstinspires.ftc.teamcode.Arm.ArmOrders.BU
+import org.firstinspires.ftc.teamcode.Arm.TakeType.OUTTAKE
+import org.firstinspires.ftc.teamcode.Arm.TakeType.NEUTRAL
+import org.firstinspires.ftc.teamcode.Arm.TakeType.INTAKE
+import org.firstinspires.ftc.teamcode.Arm.ArmStates.BasketState
+import org.firstinspires.ftc.teamcode.Arm.ArmStates.IntakeState
+import org.firstinspires.ftc.teamcode.Arm.BasketStates.High
 
 enum class ArmMember {
     UpperJoint, BottomJoint;
+}
+
+enum class ArmStates {
+    BasketState, IntakeState
+}
+
+enum class BasketStates {
+    High, Low
+}
+
+enum class TakeType {
+    INTAKE,
+    OUTTAKE,
+    NEUTRAL,
+}
+
+data class ArmOrder(
+    val first: ArmMember,
+    val second: ArmMember,
+)
+
+enum class ArmOrders(val order: ArmOrder) {
+    UB(ArmOrder(UpperJoint, BottomJoint)),
+    BU(ArmOrder(BottomJoint, UpperJoint)),
 }
 
 data class ArmPose(
@@ -20,69 +50,73 @@ data class ArmPose(
     val order: ArmOrders
 )
 
-data class ArmOrder(
-    val first: ArmMember,
-    val second: ArmMember,
-)
-
-enum class TakeType {
-    Intake,
-    Outtake,
-    Neutral,
-}
-
 enum class ArmPoses(var pose: ArmPose) {
-    Intake(ArmPose(
+    IntakePose(ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
-        takeType = TakeType.Intake,
+        takeType = INTAKE,
         order = UB,
     )),
-    HighBasket(ArmPose(
-        upperJointPosition = 0.0,
-        bottomJointPosition = 0.0,
-        takeType = TakeType.Outtake,
+    HighBasketPose(ArmPose(
+        upperJointPosition = 0.0, //In ticks
+        bottomJointPosition = 0.0, //In ticks
+        takeType = OUTTAKE,
         order = BU,
     )),
-    LowBasket(ArmPose(
-        upperJointPosition = 0.0,
-        bottomJointPosition = 0.0,
-        takeType = TakeType.Outtake,
+    LowBasketPose(ArmPose(
+        upperJointPosition = 0.0, //In ticks
+        bottomJointPosition = 0.0, //In ticks
+        takeType = OUTTAKE,
         order = BU,
     ))
 }
 
-enum class ArmOrders(val order: ArmOrder) {
-    UB(ArmOrder(UpperJoint, BottomJoint)),
-    BU(ArmOrder(BottomJoint, UpperJoint)),
-}
+class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
 
-class Arm(private val intakeConfig: IntakeConfig, private val upperJointConfig: JointConfig,
-          bottomJointConfig: JointConfig, private val hardwareMap: HardwareMap) {
+    private val intake =  Intake(config.intakeConfig, hardwareMap)
+    private val upperJoint = ArmJoint(config.upperJointConfig, hardwareMap)
+    private val bottomJoint =  ArmJoint(config.bottomJointConfig, hardwareMap)
+    private var currenArmState: ArmStates = IntakeState
 
-    private val intake =  Intake(intakeConfig, hardwareMap)
-    private val upperJoint = ArmJoint(upperJointConfig, hardwareMap)
-    private val bottomJoint =  ArmJoint(bottomJointConfig, hardwareMap)
+    val getCurrentArmState: ArmStates = currenArmState
 
-    fun setArmPosition(pose: ArmPoses, order: ArmOrders) {
-        when (order) {
+    val changeState = { currenArmState = if (currenArmState == IntakeState) BasketState else IntakeState }
+
+    var basketState: BasketStates = High
+
+    val getCurrentBasketState: BasketStates = basketState
+
+    fun setArmPosition(pose: ArmPoses) {
+        when (pose.pose.order) {
             UB -> {
                 upperJoint.setTargetPosition(pose.pose.upperJointPosition)
                 bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
-                setIntake(pose.pose.takeType)
+
+                setIntakeWhenArmIsAtDesiredPosition(pose)
             }
             BU -> {
                 bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
                 upperJoint.setTargetPosition(pose.pose.upperJointPosition)
-                setIntake(pose.pose.takeType)
+
+                setIntakeWhenArmIsAtDesiredPosition(pose)
+
             }
         }
     }
+
     private fun setIntake(takeType: TakeType) {
         when (takeType) {
-            TakeType.Intake -> intake::runIntake
-            TakeType.Outtake -> intake::runOutTake
-            TakeType.Neutral -> intake::stopIntake
+            INTAKE -> intake::runIntake
+            OUTTAKE -> intake::runOutTake
+            NEUTRAL -> intake::stopIntake
         }
     }
+
+    private fun setIntakeWhenArmIsAtDesiredPosition(pose: ArmPoses) {
+        WaitUntilCommand {
+            upperJoint.getJointPosition() == pose.pose.upperJointPosition &&
+                    bottomJoint.getJointPosition() == pose.pose.bottomJointPosition
+        }.andThen(InstantCommand({ setIntake(pose.pose.takeType) }))
+    }
+
 }
