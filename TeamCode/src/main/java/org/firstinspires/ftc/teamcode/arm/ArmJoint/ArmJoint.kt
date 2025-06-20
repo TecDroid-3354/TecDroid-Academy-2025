@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Arm
+package org.firstinspires.ftc.teamcode.arm.ArmJoint
 
 import androidx.core.math.MathUtils
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -8,14 +8,23 @@ import org.firstinspires.ftc.ulateamcode.Arm.ArmJointConfig
 
 class ArmJoint(private val config: ArmJointConfig, private val hardwareMap: HardwareMap) : SubsystemBase() {
 
+    // Initializes the motor controller for the joint
     private lateinit var jointMotorController: Motor
 
+    // Initializes the motor's encoder
     private val motorEncoder: Motor.Encoder = jointMotorController.encoder
 
+    // Gets the motor's position
     private val motorPosition: Double = motorEncoder.position.toDouble()
 
+    /**
+     * Gets the current joint's position by applying the member's reduction
+     */
     fun getJointPosition() = config.gearRatio.apply(motorPosition)
 
+    /**
+     * Sets the desired position to the joint
+     */
     fun setTargetPosition(position: Double) {
         val clampedPosition = MathUtils.clamp(position, config.bottomAngleLimit, config.upperAngleLimit)
         jointMotorController.setTargetPosition(clampedPosition.toInt())
@@ -26,6 +35,10 @@ class ArmJoint(private val config: ArmJointConfig, private val hardwareMap: Hard
         configureMotor()
     }
 
+    /**
+     * Configures the joint's motor by assigning it an Id, a position coefficient, a direction, a zero power behavior
+     * and the desired run mode
+     */
     private fun configureMotor() {
 
         jointMotorController.resetEncoder()

@@ -1,19 +1,20 @@
-package org.firstinspires.ftc.teamcode.Arm
+package org.firstinspires.ftc.teamcode.arm.ArmSystem
 
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.WaitUntilCommand
-import org.firstinspires.ftc.teamcode.Intake.Intake
-import org.firstinspires.ftc.teamcode.Arm.ArmMember.UpperJoint
-import org.firstinspires.ftc.teamcode.Arm.ArmMember.BottomJoint
-import org.firstinspires.ftc.teamcode.Arm.ArmOrders.UB
-import org.firstinspires.ftc.teamcode.Arm.ArmOrders.BU
-import org.firstinspires.ftc.teamcode.Arm.TakeType.OUTTAKE
-import org.firstinspires.ftc.teamcode.Arm.TakeType.NEUTRAL
-import org.firstinspires.ftc.teamcode.Arm.TakeType.INTAKE
-import org.firstinspires.ftc.teamcode.Arm.ArmStates.BasketState
-import org.firstinspires.ftc.teamcode.Arm.ArmStates.IntakeState
-import org.firstinspires.ftc.teamcode.Arm.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.ArmJoint.ArmJoint
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmMember.UpperJoint
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmMember.BottomJoint
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmOrders.UB
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmOrders.BU
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.OUTTAKE
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.NEUTRAL
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.INTAKE
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates.BasketState
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates.IntakeState
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.Intake.Intake
 
 enum class ArmMember {
     UpperJoint, BottomJoint;
@@ -51,42 +52,70 @@ data class ArmPose(
 )
 
 enum class ArmPoses(var pose: ArmPose) {
-    IntakePose(ArmPose(
+    IntakePose(
+        ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = INTAKE,
         order = UB,
-    )),
-    HighBasketPose(ArmPose(
+    )
+    ),
+    HighBasketPose(
+        ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = OUTTAKE,
         order = BU,
-    )),
-    LowBasketPose(ArmPose(
+    )
+    ),
+    LowBasketPose(
+        ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = OUTTAKE,
         order = BU,
-    ))
+    )
+    )
 }
 
 class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
 
-    private val intake =  Intake(config.intakeConfig, hardwareMap)
+    val intake =  Intake(config.intakeConfig, hardwareMap)
     private val upperJoint = ArmJoint(config.upperJointConfig, hardwareMap)
     private val bottomJoint =  ArmJoint(config.bottomJointConfig, hardwareMap)
-    private var currenArmState: ArmStates = IntakeState
 
-    val getCurrentArmState: ArmStates = currenArmState
+    /**
+     * Sets a default current state
+     */
+    private var currentArmState: ArmStates = IntakeState
 
-    val changeState = { currenArmState = if (currenArmState == IntakeState) BasketState else IntakeState }
+    /**
+     * Gets the current arm state
+     */
+    val getCurrentArmState: ArmStates = currentArmState
 
+    /**
+     * Changes the current arm state to the opposite of it
+     */
+    val changeState = { currentArmState = if (currentArmState == IntakeState) BasketState else IntakeState }
+
+    /**
+     * Sets a default basket state
+     */
     var basketState: BasketStates = High
 
+    /**
+     * Gets the current basket state
+     */
     val getCurrentBasketState: BasketStates = basketState
 
-    fun setArmPosition(pose: ArmPoses) {
+    /**
+     * Sets a desired [ArmPoses]. According to the [ArmPoses]'s desired order previously specified within
+     * the [ArmPose]. The function automatically sets the arm order according to the one passed within the arm pose.
+     * When the motor's encoder reports that the desired position was reached, it sets the intake according to the
+     * desired [TakeType] previously specified within the [ArmPose]
+     */
+    fun setPosition(pose: ArmPoses) {
         when (pose.pose.order) {
             UB -> {
                 upperJoint.setTargetPosition(pose.pose.upperJointPosition)
@@ -104,6 +133,9 @@ class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
         }
     }
 
+    /**
+     * Sets the intake´s mode according to the function the driver needs to be using at the time
+     */
     private fun setIntake(takeType: TakeType) {
         when (takeType) {
             INTAKE -> intake::runIntake
@@ -112,6 +144,9 @@ class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
         }
     }
 
+    /**
+     * It receives an [ArmPoses] and sets the intake when the motor's encoder has reached the desired arm position
+     */
     private fun setIntakeWhenArmIsAtDesiredPosition(pose: ArmPoses) {
         WaitUntilCommand {
             upperJoint.getJointPosition() == pose.pose.upperJointPosition &&

@@ -36,18 +36,24 @@ repositories {
     maven {
         url "https://repo.dairy.foundation/snapshots"
     }
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 
+    implementation 'com.github.ori-coval.Koala-Log:KoalaLogger:V1.0.0'
+    annotationProcessor 'com.github.ori-coval.Koala-Log:KoalaLoggingProcessor:V1.0.0'
+
     // SolversLib
     implementation "org.solverslib:core:0.2.5" // core
     implementation "org.solverslib:pedroPathing:0.2.5" // pedroPathing
 
     // Pedro Pathing
-    implementation "com.pedropathing:pedro:1.0.8" // Pedro Pathing Library
+    implementation "com.pedropathing:pedro:1.0.9" // Pedro Pathing Library
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16" // FTC Dashboard
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.10'

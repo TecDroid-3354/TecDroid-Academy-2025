@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.Intake
+package org.firstinspires.ftc.teamcode.arm.Intake
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.seattlesolvers.solverslib.controller.PIDFController
 
 data class IntakeConfig (
     val servoId: String,

@@ -1,9 +1,7 @@
-package org.firstinspires.ftc.teamcode.Arm
+package org.firstinspires.ftc.teamcode.arm.ArmSystem
 
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap
-import org.firstinspires.ftc.teamcode.Intake.Intake
-import org.firstinspires.ftc.teamcode.Intake.IntakeConfig
-import org.firstinspires.ftc.teamcode.Intake.intakeConfig
+import org.firstinspires.ftc.teamcode.arm.Intake.IntakeConfig
+import org.firstinspires.ftc.teamcode.arm.Intake.intakeConfig
 import org.firstinspires.ftc.ulateamcode.Arm.ArmJointConfig
 import org.firstinspires.ftc.ulateamcode.Arm.bottomJointConfig
 import org.firstinspires.ftc.ulateamcode.Arm.upperJointConfig

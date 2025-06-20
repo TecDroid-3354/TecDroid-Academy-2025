@@ -22,7 +22,7 @@ apply plugin: 'com.android.application'
 android {
 
     //noinspection GradleDependency
-    compileSdkVersion 30
+    compileSdkVersion 34
 
     signingConfigs {
         release {
@@ -52,8 +52,8 @@ android {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 24
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 28
+        //noinspection EditedTargetSdkVersion,ExpiredTargetSdkVersion
+        targetSdkVersion 34
 
         /**
          * We keep the versionCode and versionName of robot controller applications in sync with

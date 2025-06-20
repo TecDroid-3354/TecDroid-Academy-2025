@@ -9,20 +9,19 @@ import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import org.firstinspires.ftc.teamcode.Arm.Arm
-import org.firstinspires.ftc.teamcode.Arm.armSystemConfig
-import org.firstinspires.ftc.teamcode.Drivetrain.TankDrive
-import org.firstinspires.ftc.teamcode.Drivetrain.tankConfig
-import org.firstinspires.ftc.teamcode.Arm.ArmStates
-import org.firstinspires.ftc.teamcode.Arm.BasketStates.Low
-import org.firstinspires.ftc.teamcode.Arm.BasketStates.High
-import org.firstinspires.ftc.teamcode.Arm.ArmPoses.IntakePose
-import org.firstinspires.ftc.teamcode.Arm.ArmPoses.LowBasketPose
-import org.firstinspires.ftc.teamcode.Arm.ArmPoses.HighBasketPose
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.Arm
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.armSystemConfig
+import org.firstinspires.ftc.teamcode.drivetrain.TankDrive
+import org.firstinspires.ftc.teamcode.drivetrain.tankConfig
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.Low
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.IntakePose
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.LowBasketPose
+import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.HighBasketPose
 
 @TeleOp(name = "OpMode", group = "OpMode")
-@Disabled
-class OpMode: CommandOpMode() {
+open class OpMode: CommandOpMode() {
 
     // Declare OpMode members.
     private val runtime = ElapsedTime()
@@ -57,10 +56,10 @@ class OpMode: CommandOpMode() {
         GamepadButton(gamePad, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(InstantCommand({
                 when (arm.getCurrentArmState) {
-                    ArmStates.IntakeState -> arm.setArmPosition(IntakePose)
+                    ArmStates.IntakeState -> arm.setPosition(IntakePose)
                     ArmStates.BasketState -> when (arm.getCurrentBasketState) {
-                        High -> arm.setArmPosition(HighBasketPose)
-                        Low -> arm.setArmPosition(LowBasketPose)
+                        High -> arm.setPosition(HighBasketPose)
+                        Low -> arm.setPosition(LowBasketPose)
                     }
                 }
             }))
@@ -82,17 +81,24 @@ class OpMode: CommandOpMode() {
 
         while (opModeIsActive()) {
 
-
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime)
+            telemetry.addData("Status", "Run Time: $runtime")
+
             telemetry.addData(
                 "Motors",
                 "left (%.2f), right (%.2f)",
                 tankDrive.getLeftPower(),
                 tankDrive.getRightPower()
             )
-            telemetry.addData("Intake", "Output: ")
+
+            telemetry.addData("Intake", "Output: ${arm.intake.getPower()}")
+
+            telemetry.addData("Current arm State: ", arm.getCurrentArmState)
+            telemetry.addData("Current basket State: ", arm.getCurrentBasketState)
+
             telemetry.update()
+
+            println("$")
         }
     }
 }

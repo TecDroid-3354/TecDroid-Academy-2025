@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.Drivetrain
+package org.firstinspires.ftc.teamcode.drivetrain
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.qualcomm.robotcore.hardware.configuration.annotations.MotorType
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 
 data class TankConfig(

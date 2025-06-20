@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Intake
+package org.firstinspires.ftc.teamcode.arm.Intake
 
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -28,7 +28,10 @@ class Intake (private val config: IntakeConfig, val hardwareMap: HardwareMap): S
     fun runOutTake() {
         servo.power = -1.0
     }
-    
+
+    /**
+     * Completely stops the power given to the intake's servo
+     */
     fun stopIntake() {
         servo.power = 0.0
     }

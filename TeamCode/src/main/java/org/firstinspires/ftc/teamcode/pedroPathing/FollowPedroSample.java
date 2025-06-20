@@ -10,11 +10,14 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
+import org.firstinspires.ftc.teamcode.autonomous.constants.FConstants;
+import org.firstinspires.ftc.teamcode.autonomous.constants.LConstants;
+
 import java.util.ArrayList;
 
 @Autonomous
 public class FollowPedroSample extends CommandOpMode {
-    Follower follower = new Follower(hardwareMap);
+    Follower follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
     private final ArrayList<PathChain> paths = new ArrayList<>();
     PathChain pathChain = new PathChain();
     Path path = new Path(

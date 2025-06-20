@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.Drivetrain
+package org.firstinspires.ftc.teamcode.drivetrain
 
 import androidx.core.math.MathUtils
-import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.motors.Motor
