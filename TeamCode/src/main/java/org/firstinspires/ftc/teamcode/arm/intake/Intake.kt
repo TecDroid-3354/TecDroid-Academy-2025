@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.arm.Intake
+package org.firstinspires.ftc.teamcode.arm.intake
 
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -8,6 +8,10 @@ import com.seattlesolvers.solverslib.command.SubsystemBase
  * Creates a class which holds the necessary functions that may be needed further in the code
  */
 class Intake (private val config: IntakeConfig, val hardwareMap: HardwareMap): SubsystemBase() {
+
+    /**
+     * Creates a simple continuous rotation servo.
+     */
     private lateinit var servo: CRServo
 
     /**

@@ -1,20 +1,21 @@
-package org.firstinspires.ftc.teamcode.arm.ArmSystem
+package org.firstinspires.ftc.teamcode.arm.armSystem
 
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.Subsystem
 import com.seattlesolvers.solverslib.command.WaitUntilCommand
-import org.firstinspires.ftc.teamcode.arm.ArmJoint.ArmJoint
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmMember.UpperJoint
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmMember.BottomJoint
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmOrders.UB
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmOrders.BU
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.OUTTAKE
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.NEUTRAL
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.TakeType.INTAKE
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates.BasketState
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates.IntakeState
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.High
-import org.firstinspires.ftc.teamcode.arm.Intake.Intake
+import org.firstinspires.ftc.teamcode.arm.armJoint.ArmJoint
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.UpperJoint
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.BottomJoint
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.UB
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.BU
+import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.OUTTAKE
+import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.NEUTRAL
+import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.INTAKE
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.BasketState
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.IntakeState
+import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.intake.Intake
 
 enum class ArmMember {
     UpperJoint, BottomJoint;
@@ -39,7 +40,7 @@ data class ArmOrder(
     val second: ArmMember,
 )
 
-enum class ArmOrders(val order: ArmOrder) {
+enum class ArmOrders(private val order: ArmOrder) {
     UB(ArmOrder(UpperJoint, BottomJoint)),
     BU(ArmOrder(BottomJoint, UpperJoint)),
 }
@@ -52,35 +53,30 @@ data class ArmPose(
 )
 
 enum class ArmPoses(var pose: ArmPose) {
-    IntakePose(
-        ArmPose(
+
+    IntakePose(ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = INTAKE,
         order = UB,
-    )
-    ),
-    HighBasketPose(
-        ArmPose(
+    )),
+    HighBasketPose(ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = OUTTAKE,
         order = BU,
-    )
-    ),
-    LowBasketPose(
-        ArmPose(
+    )),
+    LowBasketPose(ArmPose(
         upperJointPosition = 0.0, //In ticks
         bottomJointPosition = 0.0, //In ticks
         takeType = OUTTAKE,
         order = BU,
-    )
-    )
+    ))
 }
 
 class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
 
-    val intake =  Intake(config.intakeConfig, hardwareMap)
+    private val intake =  Intake(config.intakeConfig, hardwareMap)
     private val upperJoint = ArmJoint(config.upperJointConfig, hardwareMap)
     private val bottomJoint =  ArmJoint(config.bottomJointConfig, hardwareMap)
 
@@ -110,48 +106,48 @@ class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
     val getCurrentBasketState: BasketStates = basketState
 
     /**
-     * Sets a desired [ArmPoses]. According to the [ArmPoses]'s desired order previously specified within
+     * Sets a desired [ArmPoses]. According to the [ArmOrders]' desired order previously specified within
      * the [ArmPose]. The function automatically sets the arm order according to the one passed within the arm pose.
      * When the motor's encoder reports that the desired position was reached, it sets the intake according to the
-     * desired [TakeType] previously specified within the [ArmPose]
+     * desired [TakeType] previously specified inside the [ArmPose]
      */
     fun setPosition(pose: ArmPoses) {
         when (pose.pose.order) {
             UB -> {
                 upperJoint.setTargetPosition(pose.pose.upperJointPosition)
                 bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
-
-                setIntakeWhenArmIsAtDesiredPosition(pose)
+                setIntake(pose)
             }
             BU -> {
                 bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
                 upperJoint.setTargetPosition(pose.pose.upperJointPosition)
-
-                setIntakeWhenArmIsAtDesiredPosition(pose)
-
+                setIntake(pose)
             }
         }
     }
 
     /**
-     * Sets the intake´s mode according to the function the driver needs to be using at the time
+     * Gets the current output's value of the intake and avoids creating a new object for it inside other files
      */
-    private fun setIntake(takeType: TakeType) {
-        when (takeType) {
-            INTAKE -> intake::runIntake
-            OUTTAKE -> intake::runOutTake
-            NEUTRAL -> intake::stopIntake
-        }
+    fun getIntakeOutput() {
+        intake.getPower()
     }
 
     /**
-     * It receives an [ArmPoses] and sets the intake when the motor's encoder has reached the desired arm position
+     * Sets the intake´s mode according to the function the driver needs to be using at the time, only when
+     * both of the arm´s joints have reached their target position
      */
-    private fun setIntakeWhenArmIsAtDesiredPosition(pose: ArmPoses) {
+    private fun setIntake(pose: ArmPoses) {
         WaitUntilCommand {
             upperJoint.getJointPosition() == pose.pose.upperJointPosition &&
                     bottomJoint.getJointPosition() == pose.pose.bottomJointPosition
-        }.andThen(InstantCommand({ setIntake(pose.pose.takeType) }))
+        }.andThen(InstantCommand({
+            when (pose.pose.takeType) {
+                INTAKE -> intake::runIntake
+                OUTTAKE -> intake::runOutTake
+                NEUTRAL -> intake::stopIntake
+            }}
+        ))
     }
 
 }

@@ -1,0 +1,10 @@
+{
+  "name": "TecDroidAcademy",
+  "version": "1.0",
+  "description": "v1.0 of Joaquin's design of TecDroid Academy",
+  "main": "0",
+  "repository": "https://github.com/JuPalbo/FTC-Tecdroid-Academy.git",
+  "author": "JPablo",
+  "license": "0",
+  "private": true
+}

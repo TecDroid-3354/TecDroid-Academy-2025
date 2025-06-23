@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.arm.Intake
+package org.firstinspires.ftc.teamcode.arm.intake
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 

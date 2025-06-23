@@ -11,19 +11,22 @@ import com.pedropathing.util.Constants
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.Arm
+import com.qualcomm.robotcore.robocol.Command
+import com.seattlesolvers.solverslib.command.CommandOpMode
+import org.firstinspires.ftc.teamcode.arm.armSystem.Arm
 import org.firstinspires.ftc.teamcode.autonomous.AutoConfiguration.AutoPosesKeeper
 import org.firstinspires.ftc.teamcode.autonomous.AutoConfiguration.PathState
 import org.firstinspires.ftc.teamcode.autonomous.constants.FConstants
 import org.firstinspires.ftc.teamcode.autonomous.constants.LConstants
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.IntakePose
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.HighBasketPose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.IntakePose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.HighBasketPose
+import org.firstinspires.ftc.teamcode.arm.armSystem.armSystemConfig
 
 val Auto2dPoses = AutoPosesKeeper(
 
-//Radians have to be ajusted
-//All poses must be tested before execution, everything is a estimated pose
-//Pickup3Pose is an estimated pose to pick up the third piece because it doesn't have dirrect contact
+// Radians have to be adjusted
+// All poses must be tested before execution, everything is an estimated pose
+// Pickup3Pose is an estimated pose to pick up the third piece because it doesn't has direct contact
     startPose = Pose(135.0, 35.0, Math.toRadians(270.0)),
     scorePose = Pose(128.0, 16.0, Math.toRadians(315.0)),
     pickup1Pose = Pose(42.0, 121.0, Math.toRadians(0.0)),
@@ -33,8 +36,8 @@ val Auto2dPoses = AutoPosesKeeper(
     controlParkPose = Pose(79.0, 48.0, Math.toRadians(90.0))
 )
 
-@Autonomous(name = "ThreeBucketAuto", group = "Red Autonomous")
-class ThreeBucketAuto: OpMode() {
+@Autonomous(name = "ThreeBucketBlueAuto", group = "Autonomous")
+class ThreeBucketAuto: CommandOpMode() {
 
     private lateinit var follower: Follower
 
@@ -159,7 +162,6 @@ class ThreeBucketAuto: OpMode() {
                     pathState.changeTo(9)
                 }
             }
-
             PathState(9) -> {
                 if (follower.isBusy.not()) {
                     arm.setPosition(HighBasketPose)
@@ -193,6 +195,7 @@ class ThreeBucketAuto: OpMode() {
             PathState(14) -> {
                 if(follower.isBusy.not()){
                     follower.followPath(park, true)
+                    // Set the path state to one that we are not going to use
                     pathState.changeTo(-1)
                 }
             }
@@ -210,23 +213,9 @@ class ThreeBucketAuto: OpMode() {
     }
 
     /**
-     * This is the main loop of OpMode, it will run repeatedly
-     */
-    override fun loop() {
-        follower.update()
-        autonomousPathUpdate()
-
-        telemetry.addData("PathState: ", pathState)
-        telemetry.addData("X Coordinates: ", follower.pose.x)
-        telemetry.addData("Y Coordinates: ", follower.pose.y)
-        telemetry.addData("Robot heading: ", follower.pose.heading)
-        telemetry.update()
-    }
-
-    /**
      * This method is called once in the init of the OpMode
      */
-    override fun init() {
+    override fun initialize() {
         pathTimer = Timer()
         opModeTimer = Timer()
         opModeTimer.resetTimer()
@@ -235,24 +224,33 @@ class ThreeBucketAuto: OpMode() {
         follower = Follower(hardwareMap, FConstants::class.java, LConstants::class.java)
         follower.setStartingPose(Auto2dPoses.startPose)
         buildPaths()
+
+        //  Initialize the arm system
+        arm = Arm(armSystemConfig, hardwareMap)
     }
 
-    /**
-     * This method is called continuously after Init while waiting for "play".
-     **/
-    override fun init_loop() {}
+    override fun runOpMode() {
 
-    /**
-     *This method is called once at the start of the OpMode.
-     * It runs all the set up actions, including building paths and reset-ing the timer.
-     */
-    override fun start() {
+        initialize()
+
+        waitForStart()
+
         opModeTimer.resetTimer()
         pathState.changeTo(0)
-    }
 
-    /**
-     * When the OpMode is done, this method will stop certain actions
-     */
-    override fun stop() {}
+        while (!isStopRequested && opModeIsActive()) {
+
+            follower.update()
+            autonomousPathUpdate()
+
+            telemetry.addData("PathState: ", pathState)
+            telemetry.addData("X Coordinates: ", follower.pose.x)
+            telemetry.addData("Y Coordinates: ", follower.pose.y)
+            telemetry.addData("Robot heading: ", follower.pose.heading)
+            telemetry.update()
+
+            run()
+        }
+        reset()
+    }
 }

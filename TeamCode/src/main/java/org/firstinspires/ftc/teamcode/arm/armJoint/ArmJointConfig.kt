@@ -17,6 +17,10 @@ data class ArmJointConfig(
     val runMode: Motor.RunMode
 )
 
+/**
+ * Still need to configure joint with the correct motor type, direction, reduction, bottom and superior angle
+ * limits and the P controller.
+ */
 val bottomJointConfig = ArmJointConfig(
     motorId = "bottomLinkMotor",
     motorType = Motor.GoBILDA.RPM_1150,
@@ -29,6 +33,10 @@ val bottomJointConfig = ArmJointConfig(
     runMode = Motor.RunMode.PositionControl
 )
 
+/**
+ * Still need to configure joint with the correct motor type, direction, reduction, bottom and superior angle
+ * limits and the P controller.
+ */
 val upperJointConfig = ArmJointConfig(
     motorId = "upperLinkMotor",
     motorType = Motor.GoBILDA.RPM_1150,

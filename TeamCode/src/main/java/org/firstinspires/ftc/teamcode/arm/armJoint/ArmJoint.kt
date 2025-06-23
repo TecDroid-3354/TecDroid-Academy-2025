@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.arm.ArmJoint
+package org.firstinspires.ftc.teamcode.arm.armJoint
 
 import androidx.core.math.MathUtils
 import com.qualcomm.robotcore.hardware.HardwareMap

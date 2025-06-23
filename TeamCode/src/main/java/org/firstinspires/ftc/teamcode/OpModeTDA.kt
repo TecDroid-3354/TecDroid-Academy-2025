@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.util.ElapsedTime
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -9,19 +8,19 @@ import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.Arm
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.armSystemConfig
+import org.firstinspires.ftc.teamcode.arm.armSystem.Arm
+import org.firstinspires.ftc.teamcode.arm.armSystem.armSystemConfig
 import org.firstinspires.ftc.teamcode.drivetrain.TankDrive
 import org.firstinspires.ftc.teamcode.drivetrain.tankConfig
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmStates
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.Low
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.BasketStates.High
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.IntakePose
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.LowBasketPose
-import org.firstinspires.ftc.teamcode.arm.ArmSystem.ArmPoses.HighBasketPose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates
+import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.Low
+import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.IntakePose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.LowBasketPose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.HighBasketPose
 
 @TeleOp(name = "OpMode", group = "OpMode")
-open class OpMode: CommandOpMode() {
+open class OpModeTDA: CommandOpMode() {
 
     // Declare OpMode members.
     private val runtime = ElapsedTime()
@@ -63,7 +62,6 @@ open class OpMode: CommandOpMode() {
                     }
                 }
             }))
-
     }
 
     override fun runOpMode() {
@@ -91,14 +89,12 @@ open class OpMode: CommandOpMode() {
                 tankDrive.getRightPower()
             )
 
-            telemetry.addData("Intake", "Output: ${arm.intake.getPower()}")
+            telemetry.addData("Intake", "Output: ${arm.getIntakeOutput()}")
 
             telemetry.addData("Current arm State: ", arm.getCurrentArmState)
             telemetry.addData("Current basket State: ", arm.getCurrentBasketState)
 
             telemetry.update()
-
-            println("$")
         }
     }
 }
