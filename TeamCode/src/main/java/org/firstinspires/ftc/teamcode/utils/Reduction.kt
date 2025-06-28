@@ -7,5 +7,7 @@ class Reduction(private val ratio: Double) {
     fun apply(value: Double) = value.div(ratio)
     
     fun unApply(value: Double) = value.times(ratio)
+
+    fun evenMoreUselessFun() {}
 }
 
