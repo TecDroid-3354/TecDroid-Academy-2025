@@ -95,6 +95,7 @@ class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
      */
     val changeState = { currentArmState = if (currentArmState == IntakeState) BasketState else IntakeState }
 
+    val zero = 0
     /**
      * Sets a default basket state
      */
