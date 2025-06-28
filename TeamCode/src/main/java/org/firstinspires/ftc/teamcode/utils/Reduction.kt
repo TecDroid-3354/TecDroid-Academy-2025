@@ -8,6 +8,6 @@ class Reduction(private val ratio: Double) {
     
     fun unApply(value: Double) = value.times(ratio)
 
-    fun evenMoreUselessFun() {}
+    fun uselessFun() {}
 }
 
