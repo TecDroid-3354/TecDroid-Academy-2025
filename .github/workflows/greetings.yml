@@ -1,0 +1,22 @@
+name: Greetings
+run-name: ${{ github.actor }} opened a pull request to main for the first time!
+
+on: 
+  pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+    
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.TOKEN }}
+        pr-message: |
+          Congrats! This is your first of, hopefully, many pull request to the main branch.
+          This means, when approved, that your code will be used at competition!
