@@ -56,5 +56,5 @@ dependencies {
     implementation "com.pedropathing:pedro:1.0.9" // Pedro Pathing Library
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16" // FTC Dashboard
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.21'
 }
