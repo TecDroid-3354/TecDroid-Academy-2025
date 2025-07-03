@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.seattlesolvers.solverslib.controller.PIDController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 import org.firstinspires.ftc.teamcode.utils.Reduction
-import org.firstinspires.ftc.ulateamcode.Arm.upperJointConfig
 
 data class SliderConfig (
     val motorId: String,
