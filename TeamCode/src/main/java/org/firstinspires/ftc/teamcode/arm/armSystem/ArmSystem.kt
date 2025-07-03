@@ -149,5 +149,4 @@ class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
             }}
         ))
     }
-
 }
