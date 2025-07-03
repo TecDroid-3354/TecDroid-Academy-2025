@@ -29,9 +29,7 @@ class Gripper(private val config: GripperConfig, private val hardwareMap: Hardwa
         isOpen = false
     }
 
-    fun getPosition() {
-        servo.position
-    }
+    fun getPosition() = servo.position
 
     init {
         configureServo()
@@ -39,7 +37,7 @@ class Gripper(private val config: GripperConfig, private val hardwareMap: Hardwa
     private fun configureServo() {
         servo = hardwareMap.get(ServoEx::class.java, config.servoId)
 
-        servo.inverted
+        servo.inverted = config.isInverted
 
         servo.setRange(config.minimumMovementRange, config.maximumMovementRange)
     }
