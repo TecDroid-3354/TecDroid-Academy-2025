@@ -25,8 +25,9 @@ class SliderJoint(private val config: SliderJointConfig, private val hardwareMap
      * Returns a slider Joint position by calculating an output with a PID controller. The position must be given
      * in ticks
      */
-    fun setPosition(position: Int) {
-        val clampedPosition = MathUtils.clamp(position, config.bottomJointLimit, config.upperJointLimit)
+    fun setPosition(position: Double) {
+
+        val clampedPosition = MathUtils.clamp(position.toInt(), config.bottomJointLimit, config.upperJointLimit)
         sliderJointMotorController.setTargetPosition(clampedPosition)
 
         while (sliderJointMotorController.atTargetPosition().not()) {
@@ -40,6 +41,8 @@ class SliderJoint(private val config: SliderJointConfig, private val hardwareMap
     }
 
     private fun configureMotor() {
+
+        pidController.setTolerance(10.0)
 
         sliderJointMotorController = Motor(hardwareMap, config.motorId, config.motorType)
 

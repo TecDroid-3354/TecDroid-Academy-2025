@@ -6,11 +6,14 @@ import org.firstinspires.ftc.teamcode.arm.slider.SliderConfig
 import org.firstinspires.ftc.teamcode.arm.slider.sliderConfig
 import org.firstinspires.ftc.teamcode.arm.sliderJoint.SliderJointConfig
 import org.firstinspires.ftc.teamcode.arm.sliderJoint.sliderJointConfig
+import org.firstinspires.ftc.teamcode.arm.wrist.WristConfig
+import org.firstinspires.ftc.teamcode.arm.wrist.wristConfig
 
 data class ArmSystemConfig(
     val gripperConfig: GripperConfig,
     val sliderConfig: SliderConfig,
     val sliderJointConfig: SliderJointConfig,
+    val wristConfig: WristConfig
 )
 
 /**
@@ -19,7 +22,8 @@ data class ArmSystemConfig(
 val armSystemConfig = ArmSystemConfig(
     gripperConfig = gripperConfig,
     sliderConfig = sliderConfig,
-    sliderJointConfig = sliderJointConfig
+    sliderJointConfig = sliderJointConfig,
+    wristConfig = wristConfig
 )
 
 

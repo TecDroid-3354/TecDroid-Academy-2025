@@ -15,14 +15,14 @@ class Gripper(private val config: GripperConfig, private val hardwareMap: Hardwa
 
     private var isOpen = false
 
-    private fun open() {
+    fun open() {
         if (!isOpen) {
             servo.position = 1.0
         }
         isOpen = true
     }
 
-    private fun close() {
+    fun close() {
         if (isOpen) {
             servo.position = 0.0
         }
@@ -32,9 +32,14 @@ class Gripper(private val config: GripperConfig, private val hardwareMap: Hardwa
     fun getPosition() = servo.position
 
     init {
+        require(config.maximumMovementRange > config.minimumMovementRange && config.minimumMovementRange > 0) {
+            "The maximum movement range must be greater than the minimum one, this one must be also greater than zero"
+        }
         configureServo()
     }
+
     private fun configureServo() {
+
         servo = hardwareMap.get(ServoEx::class.java, config.servoId)
 
         servo.inverted = config.isInverted

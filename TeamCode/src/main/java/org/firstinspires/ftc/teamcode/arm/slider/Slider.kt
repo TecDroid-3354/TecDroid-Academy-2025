@@ -19,11 +19,12 @@ class Slider (private val config: SliderConfig, private val hardwareMap: Hardwar
         configureMotor()
     }
 
-    fun getSliderPosition() = config.gearRatio.apply(sliderMotorController.currentPosition.toDouble())
+    fun getPosition() = config.gearRatio.apply(sliderMotorController.currentPosition.toDouble())
 
-    fun setPosition(position: Int) {
-        val clampedPosition =
-            MathUtils.clamp(position, config.bottomSliderLimit, config.upperSliderLimit)
+    fun getPositionError() = pidController.positionError
+
+    fun setPosition(position: Double) {
+        val clampedPosition = MathUtils.clamp(position.toInt(), config.bottomSliderLimit, config.upperSliderLimit)
         sliderMotorController.setTargetPosition(clampedPosition)
 
         while (sliderMotorController.atTargetPosition().not()) {
@@ -36,6 +37,8 @@ class Slider (private val config: SliderConfig, private val hardwareMap: Hardwar
     }
 
     private fun configureMotor() {
+
+        pidController.setTolerance(10.0)
 
         sliderMotorController = Motor(hardwareMap, config.motorId, config.motorType)
 

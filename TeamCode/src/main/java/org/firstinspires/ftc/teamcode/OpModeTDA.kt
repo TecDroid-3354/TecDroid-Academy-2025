@@ -12,12 +12,20 @@ import org.firstinspires.ftc.teamcode.arm.armSystem.Arm
 import org.firstinspires.ftc.teamcode.arm.armSystem.armSystemConfig
 import org.firstinspires.ftc.teamcode.drivetrain.TankDrive
 import org.firstinspires.ftc.teamcode.drivetrain.tankConfig
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.BasketState
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.IntakeState
 import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.Low
 import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.High
 import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.IntakePose
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.LowBasketPose
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.HighBasketPose
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.HighBasket
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmPoses.LowBasket
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WJS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.JWS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WJS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.SWJ
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.JSW
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WSJ
+import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates
 
 @TeleOp(name = "OpMode", group = "OpMode")
 open class OpModeTDA: CommandOpMode() {
@@ -43,25 +51,28 @@ open class OpModeTDA: CommandOpMode() {
     }
 
     private fun configureButtonBindings() {
+
+        GamepadButton(gamePad, GamepadKeys.Button.DPAD_RIGHT)
+            .whenPressed(InstantCommand(arm.changeState))
+
         GamepadButton(gamePad, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(InstantCommand({ arm.basketState = High }))
+            .whenPressed(InstantCommand({ arm.currentBasketState = High }))
 
         GamepadButton(gamePad, GamepadKeys.Button.DPAD_DOWN)
-            .whenPressed(InstantCommand({ arm.basketState = Low }))
+            .whenPressed(InstantCommand({ arm.currentBasketState = Low }))
 
         GamepadButton(gamePad, GamepadKeys.Button.LEFT_BUMPER)
-            .whenPressed(InstantCommand({ arm::changeState }))
-
-        GamepadButton(gamePad, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(InstantCommand({
-                when (arm.getCurrentArmState) {
-                    ArmStates.IntakeState -> arm.setPosition(IntakePose)
-                    ArmStates.BasketState -> when (arm.getCurrentBasketState) {
-                        High -> arm.setPosition(HighBasketPose)
-                        Low -> arm.setPosition(LowBasketPose)
-                    }
+                when (arm.currentArmState) {
+                    BasketState -> when (arm.currentBasketState) {
+                            High -> arm.setPosition(HighBasket, JSW.order)
+                            Low -> arm.setPosition(LowBasket, JSW.order)
+                        }
+                    IntakeState -> arm.setPosition(IntakePose, WJS.order)
                 }
             }))
+
+
     }
 
     override fun runOpMode() {
@@ -88,11 +99,6 @@ open class OpModeTDA: CommandOpMode() {
                 tankDrive.getLeftPower(),
                 tankDrive.getRightPower()
             )
-
-            telemetry.addData("Intake", "Output: ${arm.getIntakeOutput()}")
-
-            telemetry.addData("Current arm State: ", arm.getCurrentArmState)
-            telemetry.addData("Current basket State: ", arm.getCurrentBasketState)
 
             telemetry.update()
         }

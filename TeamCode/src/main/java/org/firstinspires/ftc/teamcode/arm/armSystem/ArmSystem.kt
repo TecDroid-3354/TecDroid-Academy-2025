@@ -1,22 +1,35 @@
 package org.firstinspires.ftc.teamcode.arm.armSystem
 
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.Subsystem
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.WaitUntilCommand
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.UpperJoint
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.BottomJoint
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.UB
-import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.BU
-import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.OUTTAKE
-import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.NEUTRAL
-import org.firstinspires.ftc.teamcode.arm.armSystem.TakeType.INTAKE
+import com.sun.tools.javac.comp.Resolve
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.SLIDER
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.JOINT
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmMember.WRIST
+import org.firstinspires.ftc.teamcode.arm.armSystem.GripperPosition.CLOSED
+import org.firstinspires.ftc.teamcode.arm.armSystem.GripperPosition.OPENED
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WJS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.JWS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WJS
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.SWJ
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.JSW
+import org.firstinspires.ftc.teamcode.arm.armSystem.ArmOrders.WSJ
+import org.firstinspires.ftc.teamcode.arm.gripper.Gripper
+import org.firstinspires.ftc.teamcode.arm.slider.Slider
+import org.firstinspires.ftc.teamcode.arm.sliderJoint.SliderJoint
+import org.firstinspires.ftc.teamcode.arm.wrist.Wrist
 import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.BasketState
 import org.firstinspires.ftc.teamcode.arm.armSystem.ArmStates.IntakeState
 import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.High
+import org.firstinspires.ftc.teamcode.arm.armSystem.BasketStates.Low
+
+
 
 enum class ArmMember {
-    UpperJoint, BottomJoint;
+    SLIDER, JOINT, WRIST;
 }
 
 enum class ArmStates {
@@ -27,110 +40,96 @@ enum class BasketStates {
     High, Low
 }
 
-enum class TakeType {
-    INTAKE,
-    OUTTAKE,
-    NEUTRAL,
+enum class GripperPosition {
+    OPENED, CLOSED;
 }
 
 data class ArmOrder(
     val first: ArmMember,
     val second: ArmMember,
-)
+    val third: ArmMember
+) {
+    fun getFirst() = first
+    fun getSecond() = second
+    fun getThird() = third
+}
 
-enum class ArmOrders(private val order: ArmOrder) {
-    UB(ArmOrder(UpperJoint, BottomJoint)),
-    BU(ArmOrder(BottomJoint, UpperJoint)),
+enum class ArmOrders(val order: ArmOrder) {
+    SJW(ArmOrder(SLIDER, JOINT, WRIST)),
+    JWS(ArmOrder(JOINT, WRIST, SLIDER)),
+    WJS(ArmOrder(WRIST, JOINT, SLIDER)),
+    SWJ(ArmOrder(SLIDER, WRIST, JOINT)),
+    JSW(ArmOrder(JOINT, SLIDER, WRIST)),
+    WSJ(ArmOrder(WRIST, SLIDER, JOINT)),
 }
 
 data class ArmPose(
-    val upperJointPosition: Double,
-    val bottomJointPosition: Double,
-    val takeType : TakeType,
+    val sliderDisplacement: Double,
+    val jointAngle: Double,
+    val wristAngle: Double,
+    val gripperState: GripperPosition,
     val order: ArmOrders
 )
 
-enum class ArmPoses(var pose: ArmPose) {
+enum class ArmPoses(val pose: ArmPose) {
 
     IntakePose(ArmPose(
-        upperJointPosition = 0.0, //In ticks
-        bottomJointPosition = 0.0, //In ticks
-        takeType = INTAKE,
-        order = UB,
+        sliderDisplacement = 0.0,
+        jointAngle = 0.0,
+        wristAngle = 0.0,
+        gripperState = OPENED,
+        order = WJS,
     )),
-    HighBasketPose(ArmPose(
-        upperJointPosition = 0.0, //In ticks
-        bottomJointPosition = 0.0, //In ticks
-        takeType = OUTTAKE,
-        order = BU,
+
+    HighBasket(ArmPose(
+        sliderDisplacement = 0.0,
+        jointAngle = 0.0,
+        wristAngle = 0.0,
+        gripperState = OPENED,
+        order = SWJ,
     )),
-    LowBasketPose(ArmPose(
-        upperJointPosition = 0.0, //In ticks
-        bottomJointPosition = 0.0, //In ticks
-        takeType = OUTTAKE,
-        order = BU,
-    ))
+
+    LowBasket(ArmPose(
+        sliderDisplacement = 0.0,
+        jointAngle = 0.0,
+        wristAngle = 0.0,
+        gripperState = OPENED,
+        order = SWJ,
+    )),
+    
 }
 
 class Arm(config: ArmSystemConfig, hardwareMap: HardwareMap) {
 
-//    private val upperJoint = ArmJoint(config.upperJointConfig, hardwareMap)
-//    private val bottomJoint =  ArmJoint(config.bottomJointConfig, hardwareMap)
-//
-//    /**
-//     * Sets a default current state
-//     */
-//    private var currentArmState: ArmStates = IntakeState
-//
-//    /**
-//     * Gets the current arm state
-//     */
-//    val getCurrentArmState: ArmStates = currentArmState
-//
-//    /**
-//     * Changes the current arm state to the opposite of it
-//     */
-//    val changeState = { currentArmState = if (currentArmState == IntakeState) BasketState else IntakeState }
-//
-//    /**
-//     * Sets a default basket state
-//     */
-//    var basketState: BasketStates = High
-//
-//    /**
-//     * Gets the current basket state
-//     */
-//    val getCurrentBasketState: BasketStates = basketState
-//
-//    /**
-//     * Sets a desired [ArmPoses]. According to the [ArmOrders]' desired order previously specified within
-//     * the [ArmPose]. The function automatically sets the arm order according to the one passed within the arm pose.
-//     * When the motor's encoder reports that the desired position was reached, it sets the intake according to the
-//     * desired [TakeType] previously specified inside the [ArmPose]
-//     */
-//    fun setPosition(pose: ArmPoses) {
-//        when (pose.pose.order) {
-//            UB -> {
-//                upperJoint.setTargetPosition(pose.pose.upperJointPosition)
-//                bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
-//                setIntake(pose)
-//            }
-//            BU -> {
-//                bottomJoint.setTargetPosition(pose.pose.bottomJointPosition)
-//                upperJoint.setTargetPosition(pose.pose.upperJointPosition)
-//                setIntake(pose)
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Sets the intake´s mode according to the function the driver needs to be using at the time, only when
-//     * both of the arm´s joints have reached their target position
-//     */
-//    private fun setIntake(pose: ArmPoses) {
-//        WaitUntilCommand {
-//            upperJoint.getJointPosition() == pose.pose.upperJointPosition &&
-//                    bottomJoint.getJointPosition() == pose.pose.bottomJointPosition
-//        }
-//    }
+    private val slider = Slider(config.sliderConfig, hardwareMap)
+    private val sliderJoint = SliderJoint(config.sliderJointConfig, hardwareMap)
+    private val wrist = Wrist(config.wristConfig, hardwareMap)
+    private val gripper = Gripper(config.gripperConfig, hardwareMap)
+
+    var currentArmState: ArmStates = IntakeState
+
+    val changeState = { currentArmState = if (currentArmState == IntakeState) BasketState else IntakeState }
+
+    var currentBasketState = High
+
+    private fun Gripper.setGripperPosition(position: GripperPosition): Command = when (position) {
+        OPENED -> InstantCommand({ gripper.open() })
+        CLOSED -> InstantCommand({ gripper.close() })
+    }
+
+    private fun getCommandFor(pose: ArmPoses, member: ArmMember): Command = when (member) {
+            SLIDER -> InstantCommand({ slider.setPosition(pose.pose.sliderDisplacement) })
+            JOINT -> InstantCommand({ sliderJoint.setPosition(pose.pose.jointAngle) })
+            WRIST -> InstantCommand({ wrist.setAngle(pose.pose.wristAngle) })
+        }
+
+
+    fun setPosition(pose: ArmPoses, order: ArmOrder): Command {
+        return SequentialCommandGroup(
+            getCommandFor(pose, order.getFirst()),
+            getCommandFor(pose, order.getSecond()),
+            getCommandFor(pose, order.getThird())
+        ).andThen(WaitUntilCommand { slider.getPositionError() < 20 })
+            .andThen(gripper.setGripperPosition(pose.pose.gripperState))
+    }
 }

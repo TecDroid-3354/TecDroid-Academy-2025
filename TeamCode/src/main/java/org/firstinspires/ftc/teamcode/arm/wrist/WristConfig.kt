@@ -12,6 +12,6 @@ data class WristConfig(
 val wristConfig = WristConfig(
     servoId = "wristServo",
     isInverted = true,
-    maximumMovementRange = 90.0,
-    minimumMovementRange = 0.0,
+    maximumMovementRange = 180.0, // In degrees // Needs to be changed
+    minimumMovementRange = 0.0, // In degrees // Needs to be changed
 )
