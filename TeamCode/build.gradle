@@ -14,6 +14,8 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.kapt'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
@@ -51,9 +53,10 @@ dependencies {
 
     // Pedro Pathing
     implementation "com.pedropathing:pedro:1.0.9" // Pedro Pathing Library
-    implementation "com.acmerobotics.dashboard:dashboard:0.4.16" // FTC Dashboard
+    implementation "com.acmerobotics.dashboard:dashboard:0.4.17" // FTC Dashboard
     //noinspection GradleDependency
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
     //noinspection GradleDependency
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+
 }
