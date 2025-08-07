@@ -11,5 +11,5 @@ val gripperConfig = GripperConfig(
     servoId = "gripperServo",
     isInverted = true, // Check if needs inversion
     minimumAngleRange = 0.0, // In degrees
-    maximumAngleRange = 180.0 // In degrees
+    maximumAngleRange = 90.0 // In degrees
 )

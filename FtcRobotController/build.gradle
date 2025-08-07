@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 import java.text.SimpleDateFormat
 
 //
@@ -20,9 +22,10 @@ android {
     //noinspection GradleDependency
     compileSdkVersion 30
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    tasks.withType(KotlinCompile).configureEach {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+
     }
     namespace = 'com.qualcomm.ftcrobotcontroller'
 }
