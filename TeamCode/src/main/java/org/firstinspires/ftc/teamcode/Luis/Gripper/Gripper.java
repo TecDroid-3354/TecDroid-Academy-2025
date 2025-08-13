@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Gripper;
+package org.firstinspires.ftc.teamcode.Luis.Gripper;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -31,5 +31,9 @@ public class Gripper extends SubsystemBase {
             servo.turnToAngle(0.0);
             isOpen = false;
         }
+    }
+
+    public double getPosition() {
+        return servo.getPosition();
     }
 }
