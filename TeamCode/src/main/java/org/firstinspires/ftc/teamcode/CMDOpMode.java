@@ -1,33 +1,26 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
-import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.gripperSubsystem.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.intakeSubsystem.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.HumerusSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.commands.HumerusPosition;
 import org.firstinspires.ftc.teamcode.subsystems.jointSubsystem.JointSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.jointSubsystem.commands.JointPosition;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumSubsystem.MecanumSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumSubsystem.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.sliderSubsystem.SliderSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.sliderSubsystem.commands.SliderPosition;
 import org.firstinspires.ftc.teamcode.systems.ArmSystem.ArmSystem;
 import org.firstinspires.ftc.teamcode.util.JoystickSupplier;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
 // In a regular LinearOpMode, processes are executed in a sequential workflow
 // In an OpMode, on the other hand, code is executed through loops
-@TeleOp(name = "CMD", group = "Op mode")
+@TeleOp(name = "CMDniga", group = "Op mode")
 public class CMDOpMode extends CommandOpMode {
     // Declaring input systems //
     /*
@@ -48,8 +41,9 @@ public class CMDOpMode extends CommandOpMode {
     JointSubsystem testJoint;
     SliderSubsystem testSlider;
     ArmSystem arm;
+    //IntakeSubsystem intake;
 
-    IntakeSubsystem intake;
+    HumerusSubsystem humerus;
 
     @Override
     public void initialize() {
@@ -75,10 +69,11 @@ public class CMDOpMode extends CommandOpMode {
         testJoint = new JointSubsystem(hardwareMap, telemetry);
         testSlider = new SliderSubsystem(hardwareMap, telemetry);
 
-        intake = new IntakeSubsystem(hardwareMap, telemetry);
+        //intake = new IntakeSubsystem(hardwareMap, telemetry);
 
         arm = new ArmSystem(hardwareMap, telemetry);
 
+        humerus =  new HumerusSubsystem(hardwareMap, telemetry);
         // Configuring controller key bindings
         configureBindings();
     }
@@ -102,13 +97,31 @@ public class CMDOpMode extends CommandOpMode {
                 mecanumSubsystem.resetHeading();
             }
 
+            /*if (controller.gamepad.a) {
+                intake.turnWristRotator(45);
+            }
+            if (controller.gamepad.b) {
+                intake.openGripper();
+            }
+            if (controller.gamepad.x) {
+                intake.closeGripper();
+            }*/
+            if (controller.getButton(GamepadKeys.Button.B)) {
+                //Completely up
+                humerus.setAngle(-20.0);
+            }
+            if (controller.getButton(GamepadKeys.Button.A)) {
+                //Completely down
+                humerus.setAngle(200.0);
+            }
+
             telemetry.update();
         }
     }
 
     private void configureBindings() {
         // All control bindings that involve command execution are declared here
-
+        /*
         new GamepadButton(controller, GamepadKeys.Button.X)
                 .whenPressed(new SliderPosition(testSlider, 15));
 
@@ -120,6 +133,8 @@ public class CMDOpMode extends CommandOpMode {
 
        new GamepadButton(controller, GamepadKeys.Button.A)
                 .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.HIGH_BASKET, ArmSystem.ArmOrderOptions.JS));
+                */
+
     }
 }
 

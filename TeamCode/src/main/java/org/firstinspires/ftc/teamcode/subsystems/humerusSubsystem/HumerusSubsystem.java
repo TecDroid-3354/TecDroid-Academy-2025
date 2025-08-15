@@ -12,9 +12,10 @@ import org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.misc.HumerusCo
 public class HumerusSubsystem extends SubsystemBase {
     // Declaring useful variables
     Telemetry telemetry;
-
     // Declaring servomotors
-    ServoEx humerusServo;
+    SimpleServo rightHumerusServo;
+
+    SimpleServo leftHumerusServo;
 
 
     // Constructor //
@@ -34,21 +35,25 @@ public class HumerusSubsystem extends SubsystemBase {
          *
          * For more info, refer to this link: https://docs.seattlesolvers.com/features/hardware#servos
         **/
-        humerusServo = new SimpleServo(
-                hardwareMap, HumerusConstants.Setup.humerusServoId,
-                HumerusConstants.MeasureLimits.minAngle, HumerusConstants.MeasureLimits.maxAngle
+
+        rightHumerusServo = new SimpleServo(
+                hardwareMap, HumerusConstants.humerusRightServoId,
+                HumerusConstants.MeasureLimits.rightHumerusServo.minAngle, HumerusConstants.MeasureLimits.rightHumerusServo.maxAngle
         );
+        leftHumerusServo = new SimpleServo(
+                hardwareMap, HumerusConstants.humerusLeftServoId,
+                HumerusConstants.MeasureLimits.leftHumerusServo.minAngle, HumerusConstants.MeasureLimits.leftHumerusServo.maxAngle
+        );
+        rightHumerusServo.setInverted(true);
+        leftHumerusServo.setInverted(false);
+
     }
 
     // Functional code //
     public void setAngle(double angle) {
         // The following method turns the servo to a set angle in degrees
-        humerusServo.turnToAngle(angle);
-    }
-
-    // Setup code //
-    private void Setup() {
-        humerusServo.setInverted(true);
+        rightHumerusServo.turnToAngle(angle);
+        leftHumerusServo.turnToAngle(angle);
     }
 }
 

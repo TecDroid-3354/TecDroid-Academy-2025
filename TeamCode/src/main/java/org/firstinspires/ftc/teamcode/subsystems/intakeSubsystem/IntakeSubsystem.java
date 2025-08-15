@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.gripperSubsystem;
+package org.firstinspires.ftc.teamcode.subsystems.intakeSubsystem;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.hardware.ServoEx;
 import com.seattlesolvers.solverslib.hardware.SimpleServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystems.gripperSubsystem.misc.IntakeConstants;
+import org.firstinspires.ftc.teamcode.subsystems.intakeSubsystem.misc.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
     // Declaring useful variables

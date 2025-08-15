@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.gripperSubsystem.misc;
+package org.firstinspires.ftc.teamcode.subsystems.intakeSubsystem.misc;
 
 public final class IntakeConstants {
     // Declaring setup constants, like IDs
