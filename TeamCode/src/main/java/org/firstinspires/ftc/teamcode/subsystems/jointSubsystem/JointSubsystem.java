@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.jointSubsystem;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -17,16 +18,17 @@ public class JointSubsystem extends SubsystemBase {
     // Declaring useful variables
     HardwareMap hardwareMap;
     Telemetry telemetry;
-    JointMath jointMath = new JointMath(
+    public JointMath jointMath = new JointMath(
             JointConstants.MotorProperties.ticksFor90,
             JointConstants.MotorProperties.gearRatioReduction
     );
 
     private double targetAngle = 0.0;
+    public int currentEncoderTicks = 0;
 
 
     // Declaring motors
-    MotorEx rightJointMotor, leftJointMotor;
+    public MotorEx rightJointMotor, leftJointMotor;
     MotorGroup jointMotors;
 
 
@@ -52,9 +54,11 @@ public class JointSubsystem extends SubsystemBase {
     *
     * */
     public void setAngle(double angle) {
+        if (targetAngle == angle) return;
+
         // Clamping the angle to ensure it is within the encoder's limits, preventing it from breaking
         double clampedAngle = MathUtils.clamp(
-                angle * -1,
+                angle,
                 JointConstants.MeasureLimits.minAngleAllowed,
                 JointConstants.MeasureLimits.maxAngleAllowed);
 
@@ -93,21 +97,23 @@ public class JointSubsystem extends SubsystemBase {
          */
 
         // todo: tune the PID coefficients
-        PIDFController pidf = new PIDFController(0.6, 0.0, 0.01, 0.01);
-        pidf.setSetPoint(setpointTicks); // Sets a desired setpoint for the motors to reach
-        pidf.setTolerance(10); // Represents the position tolerance, in ticks
+        PIDController pidf = new PIDController(0.003, 0.0, 0.0);
+        pidf.setSetPoint(jointMath.toDegrees(currentEncoderTicks)); // Sets a desired setpoint for the motors to reach
+        pidf.setTolerance(2.0); // Represents the position tolerance, in ticks
 
         while (!pidf.atSetPoint()) {
             // Returns the Throughbore's current reading
-            double currentTicks = rightJointMotor.getCurrentPosition();
+            currentEncoderTicks = rightJointMotor.getCurrentPosition();
 
             // The .calculate() method should be called on each iteration of the loop
             // It calculates the difference between two readings, and therefore, the distance
             // to reach
-            double output = pidf.calculate(currentTicks, setpointTicks);
+            //double output = pidf.calculate(currentEncoderTicks, setpointTicks);
+            double output = pidf.calculate(jointMath.toDegrees(currentEncoderTicks), clampedAngle);
+
 
             // Clamp motor power output to a safe, achievable range
-            double power = MathUtils.clamp(output / 100, -1.0, 1.0);
+            double power = MathUtils.clamp(output, -1.0, 1.0);
 
             // Sets motor power for the motor group (which is the same doing it individually)
             jointMotors.set(power);
@@ -153,7 +159,7 @@ public class JointSubsystem extends SubsystemBase {
         jointMotors.setVeloCoefficients(1.0, 0.0, 0.0);
 
         // Setting up encoder direction
-        rightJointMotor.encoder.setDirection(Motor.Direction.FORWARD);
+        rightJointMotor.encoder.setDirection(Motor.Direction.REVERSE);
     }
 }
 

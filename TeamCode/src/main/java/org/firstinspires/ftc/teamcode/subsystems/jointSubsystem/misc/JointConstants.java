@@ -27,11 +27,11 @@ public final class JointConstants {
     public static final class MeasureLimits {
         // minAngleAllowed defines the minimum ticks the encoder can take at the lowest angle permitted.
         // This is be the equivalent to the joint being at 0 degrees
-        public static final double minAngleAllowed = -88.0;
+        public static final double minAngleAllowed = 0.0;
 
         // maxAngleAllowed defines the maximum ticks the encoder can take at the greatest angle permitted.
         // This is be the equivalent to the joint being at 90 degrees
-        public static final double maxAngleAllowed = 0.0;
+        public static final double maxAngleAllowed = 90.0;
     }
 }
 

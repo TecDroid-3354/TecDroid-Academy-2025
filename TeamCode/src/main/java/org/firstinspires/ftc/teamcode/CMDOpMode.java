@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
@@ -11,9 +12,12 @@ import org.firstinspires.ftc.teamcode.subsystems.intakeSubsystem.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.HumerusSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.commands.HumerusPosition;
 import org.firstinspires.ftc.teamcode.subsystems.jointSubsystem.JointSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.jointSubsystem.commands.JointPosition;
+import org.firstinspires.ftc.teamcode.subsystems.jointSubsystem.misc.JointMath;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumSubsystem.MecanumSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumSubsystem.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.sliderSubsystem.SliderSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sliderSubsystem.commands.SliderPosition;
 import org.firstinspires.ftc.teamcode.systems.ArmSystem.ArmSystem;
 import org.firstinspires.ftc.teamcode.util.JoystickSupplier;
 
@@ -65,7 +69,7 @@ public class CMDOpMode extends CommandOpMode {
                 )
         );
 
-        // Test subsystems 
+        // Test subsystems
         testJoint = new JointSubsystem(hardwareMap, telemetry);
         testSlider = new SliderSubsystem(hardwareMap, telemetry);
 
@@ -88,6 +92,8 @@ public class CMDOpMode extends CommandOpMode {
 
         // Run the scheduler
         while (opModeIsActive()) {
+            telemetry.addData("Joint read", testJoint.jointMath
+                    .toDegrees(testJoint.rightJointMotor.getCurrentPosition()));
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run();
 
@@ -106,14 +112,14 @@ public class CMDOpMode extends CommandOpMode {
             if (controller.gamepad.x) {
                 intake.closeGripper();
             }*/
-            if (controller.getButton(GamepadKeys.Button.B)) {
-                //Completely up
-                humerus.setAngle(-20.0);
-            }
-            if (controller.getButton(GamepadKeys.Button.A)) {
-                //Completely down
-                humerus.setAngle(200.0);
-            }
+//            if (controller.getButton(GamepadKeys.Button.B)) {
+//                //Completely up
+//                humerus.setAngle(-20.0);
+//            }
+//            if (controller.getButton(GamepadKeys.Button.A)) {
+//                //Completely down
+//                humerus.setAngle(200.0);
+//            }
 
             telemetry.update();
         }
@@ -121,19 +127,22 @@ public class CMDOpMode extends CommandOpMode {
 
     private void configureBindings() {
         // All control bindings that involve command execution are declared here
-        /*
+
         new GamepadButton(controller, GamepadKeys.Button.X)
                 .whenPressed(new SliderPosition(testSlider, 15));
 
        new GamepadButton(controller, GamepadKeys.Button.B)
-                .whenPressed(new JointPosition(testJoint, 80.0));
+                .whenPressed(new JointPosition(testJoint, 45.0));
+
+        new GamepadButton(controller, GamepadKeys.Button.Y)
+                .whenPressed(new JointPosition(testJoint, 70.0));
 
        new GamepadButton(controller, GamepadKeys.Button.X)
                 .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.QUESADILLA, ArmSystem.ArmOrderOptions.SJ));
 
        new GamepadButton(controller, GamepadKeys.Button.A)
                 .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.HIGH_BASKET, ArmSystem.ArmOrderOptions.JS));
-                */
+
 
     }
 }
