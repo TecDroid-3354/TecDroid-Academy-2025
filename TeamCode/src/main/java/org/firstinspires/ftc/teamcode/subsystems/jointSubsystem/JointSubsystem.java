@@ -97,9 +97,9 @@ public class JointSubsystem extends SubsystemBase {
          */
 
         // todo: tune the PID coefficients
-        PIDController pidf = new PIDController(0.003, 0.0, 0.0);
+        PIDController pidf = new PIDController(0.03, 0.0, 0.0003);
         pidf.setSetPoint(jointMath.toDegrees(currentEncoderTicks)); // Sets a desired setpoint for the motors to reach
-        pidf.setTolerance(2.0); // Represents the position tolerance, in ticks
+        pidf.setTolerance(2.0); // Represents the position tolerance, in degrees
 
         while (!pidf.atSetPoint()) {
             // Returns the Throughbore's current reading

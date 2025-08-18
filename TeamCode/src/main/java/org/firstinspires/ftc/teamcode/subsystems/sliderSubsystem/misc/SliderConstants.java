@@ -30,12 +30,12 @@ public final class SliderConstants {
         // minCmAllowed defines the maximum ticks the encoder can take at the smallest distance
         // allowed. This is be the equivalent to the slider having travelled 0 cm, which is equal
         // to the elevator being at 0 centimeters from the bottom (starting position)
-        public static final double minCmAllowed = -100.0;
+        public static final double minCmAllowed = 0.0;
 
         // maxCmAllowed defines the maximum ticks the encoder can take at the greatest distance
         // allowed. This is be the equivalent to the slider having travelled 100 cm from the bottom,
         // which is the max distance it can travel without breaking (top limit)
-        public static final double maxCmAllowed = 0.0;
+        public static final double maxCmAllowed = 300.0;
     }
 }
 

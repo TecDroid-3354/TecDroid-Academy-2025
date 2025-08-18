@@ -18,17 +18,18 @@ public class SliderSubsystem extends SubsystemBase {
     // Declaring useful variables
     HardwareMap hardwareMap;
     Telemetry telemetry;
-    SliderMath sliderMath = new SliderMath(
+    public SliderMath sliderMath = new SliderMath(
             SliderConstants.MotorProperties.ticksPerRevolution,
             SliderConstants.MotorProperties.linearTravelPerRevolution,
             SliderConstants.MotorProperties.gearRatio
     );
 
     private double targetCm = 0.0; // This value determines when to stop the motors in isAtTarget()
+    public double currentEncoderTicks = 0.0;
 
 
     // Declaring motors & sensors
-    MotorEx rightSliderMotor, leftSliderMotor;
+    public MotorEx rightSliderMotor, leftSliderMotor;
     MotorGroup sliderMotors;
 
 
@@ -73,7 +74,7 @@ public class SliderSubsystem extends SubsystemBase {
     public void setExtension(double distance) {
         // First of all, distance is clamped to ensure it is within safe limits
         double clampedDistance = MathUtils.clamp(
-                distance * -1,
+                distance,
                 SliderConstants.MeasureLimits.minCmAllowed,
                 SliderConstants.MeasureLimits.maxCmAllowed
         );
@@ -110,38 +111,40 @@ public class SliderSubsystem extends SubsystemBase {
          * https://docs.seattlesolvers.com/features/controllers#pid-control
          *
          */
-        PIDFController pidf = new PIDFController(0.5, 0.0, 0.002, 0.0);
-        pidf.setSetPoint(setpointTicks); // Sets a desired setpoint for the motors to reach
-        pidf.setTolerance(10); // Represents the position tolerance, in ticks
+        PIDFController pidf = new PIDFController(0.05, 0.0, 0.0, 0.0);
+        pidf.setSetPoint(targetCm); // Sets a desired setpoint for the motors to reach
+        pidf.setTolerance(3); // Represents the position tolerance, in cm
 
 
         while (!pidf.atSetPoint()) {
             // The number by which we divide the current encoder position is equal to the
             // velocity factor that will determine how fast the motors will reach the
             // desired position
-            double currentTicks = rightSliderMotor.getCurrentPosition() / 10.0;
+            // TODO: ask why over 10?
+            //double currentTicks = rightSliderMotor.getCurrentPosition() / 10.0;
+            currentEncoderTicks = rightSliderMotor.getCurrentPosition();
 
             // The .calculate() method should be called on each iteration of the loop
             // It calculates the difference between two readings, and therefore, the distance
-            // to reach
-            double output = pidf.calculate(currentTicks, setpointTicks);
+            // to reach. Output is negated since it was giving the opposite power direction.
+            double output = -1 * pidf.calculate(sliderMath.toCm(currentEncoderTicks), clampedDistance);
 
             // Clamp motor power output to a safe, achievable range
             // There is a * 7 conversion factor to ensure motor output is readable by the motors
             // todo: try divinding by max ticks per output shaft
-            double power = MathUtils.clamp((output * 7) / 100, -1.0, 1.0);
+            double power = MathUtils.clamp(output, -1.0, 1.0);
 
             // Sets motor power for the motor group (which is the same doing it individually)
             sliderMotors.set(power);
 
-            /* Temporary telemetry to debug effectively
-            telemetry.addData("Target cm", clampedDistance);
-            telemetry.addData("Total distance to move", setpointTicks);
-            telemetry.addData("Current Ticks", rightSliderMotor.getCurrentPosition());
-            telemetry.addData("Current cm", sliderMath.toCm(rightSliderMotor.getCurrentPosition()));
-            telemetry.addData("Output", output);
+            // Temporary telemetry to debug effectively
+            telemetry.addData("Target", clampedDistance);
+            //telemetry.addData("Total distance to move", setpointTicks);
+            //telemetry.addData("Current Ticks", rightSliderMotor.getCurrentPosition());
+            telemetry.addData("Position", sliderMath.toCm(rightSliderMotor.getCurrentPosition()));
+            telemetry.addData("Error", Math.abs(sliderMath.toCm(currentEncoderTicks) - targetCm));
             telemetry.addData("Power", power);
-            telemetry.update();*/
+            telemetry.update();
         }
 
         stopMotors();
@@ -152,7 +155,7 @@ public class SliderSubsystem extends SubsystemBase {
         double currentCm = sliderMath.toCm(rightSliderMotor.getCurrentPosition());
 
         // A small tolerance. It is complementary with setExpansion's while loop condition
-        return 0.5 > Math.abs(currentCm - targetCm);
+        return 5 > Math.abs(currentCm - targetCm);
     }
 
     public void stopMotors() {

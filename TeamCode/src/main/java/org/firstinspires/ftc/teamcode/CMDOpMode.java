@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.util.JoystickSupplier;
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
 // In a regular LinearOpMode, processes are executed in a sequential workflow
 // In an OpMode, on the other hand, code is executed through loops
-@TeleOp(name = "CMDniga", group = "Op mode")
+@TeleOp(name = "CMDTesting", group = "Op mode")
 public class CMDOpMode extends CommandOpMode {
     // Declaring input systems //
     /*
@@ -94,6 +94,10 @@ public class CMDOpMode extends CommandOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Joint read", testJoint.jointMath
                     .toDegrees(testJoint.rightJointMotor.getCurrentPosition()));
+
+            telemetry.addData("Slider read", testSlider.sliderMath
+                    .toCm(testSlider.rightSliderMotor.getCurrentPosition()));
+
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run();
 
@@ -112,14 +116,14 @@ public class CMDOpMode extends CommandOpMode {
             if (controller.gamepad.x) {
                 intake.closeGripper();
             }*/
-//            if (controller.getButton(GamepadKeys.Button.B)) {
-//                //Completely up
-//                humerus.setAngle(-20.0);
-//            }
-//            if (controller.getButton(GamepadKeys.Button.A)) {
-//                //Completely down
-//                humerus.setAngle(200.0);
-//            }
+            /*if (controller.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+                //Completely up
+                humerus.setAngle(-20.0);
+            }
+            if (controller.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
+                //Completely down
+                humerus.setAngle(200.0);
+            }*/
 
             telemetry.update();
         }
@@ -129,7 +133,10 @@ public class CMDOpMode extends CommandOpMode {
         // All control bindings that involve command execution are declared here
 
         new GamepadButton(controller, GamepadKeys.Button.X)
-                .whenPressed(new SliderPosition(testSlider, 15));
+                .whenPressed(new SliderPosition(testSlider, 45.0));
+
+        new GamepadButton(controller, GamepadKeys.Button.A)
+                .whenPressed(new SliderPosition(testSlider, 120.0));
 
        new GamepadButton(controller, GamepadKeys.Button.B)
                 .whenPressed(new JointPosition(testJoint, 45.0));
@@ -137,11 +144,17 @@ public class CMDOpMode extends CommandOpMode {
         new GamepadButton(controller, GamepadKeys.Button.Y)
                 .whenPressed(new JointPosition(testJoint, 70.0));
 
-       new GamepadButton(controller, GamepadKeys.Button.X)
-                .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.QUESADILLA, ArmSystem.ArmOrderOptions.SJ));
+        new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(new HumerusPosition(humerus, -20.0));
 
-       new GamepadButton(controller, GamepadKeys.Button.A)
-                .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.HIGH_BASKET, ArmSystem.ArmOrderOptions.JS));
+        new GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new HumerusPosition(humerus, 200.0));
+
+//       new GamepadButton(controller, GamepadKeys.Button.X)
+//                .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.QUESADILLA, ArmSystem.ArmOrderOptions.SJ));
+//
+//       new GamepadButton(controller, GamepadKeys.Button.A)
+//                .whenPressed(arm.setPose(ArmSystem.ArmPoseOptions.HIGH_BASKET, ArmSystem.ArmOrderOptions.JS));
 
 
     }
