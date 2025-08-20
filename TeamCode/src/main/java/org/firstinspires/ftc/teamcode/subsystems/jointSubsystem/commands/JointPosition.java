@@ -19,7 +19,7 @@ public class JointPosition extends CommandBase {
 
     @Override
     public void initialize() {
-        jointSubsystem.setAngle(angle);
+        jointSubsystem.setTargetAngle(angle);
     }
 
     @Override

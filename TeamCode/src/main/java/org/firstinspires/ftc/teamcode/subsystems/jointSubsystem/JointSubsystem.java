@@ -45,16 +45,25 @@ public class JointSubsystem extends SubsystemBase {
         motorSetup();
     }
 
+    @Override
+    public void periodic() {
+        setAngle(targetAngle);
+    }
+
 
     // Functional code //
+
+    public void setTargetAngle(double angle) {
+        targetAngle = angle;
+    }
 
     /*
     * The following function takes an angle in degrees and then, after calculating the difference
     * between target and current angles, it reaches for the desired target
     *
     * */
-    public void setAngle(double angle) {
-        if (targetAngle == angle) return;
+    private void setAngle(double angle) {
+        if (isAtTarget()) return;
 
         // Clamping the angle to ensure it is within the encoder's limits, preventing it from breaking
         double clampedAngle = MathUtils.clamp(
@@ -97,8 +106,8 @@ public class JointSubsystem extends SubsystemBase {
          */
 
         // todo: tune the PID coefficients
-        PIDController pidf = new PIDController(0.03, 0.0, 0.0003);
-        pidf.setSetPoint(jointMath.toDegrees(currentEncoderTicks)); // Sets a desired setpoint for the motors to reach
+        PIDController pidf = new PIDController(0.03, 0.0, 0.003);
+        pidf.setSetPoint(targetAngle); // Sets a desired setpoint for the motors to reach
         pidf.setTolerance(2.0); // Represents the position tolerance, in degrees
 
         while (!pidf.atSetPoint()) {
@@ -118,14 +127,14 @@ public class JointSubsystem extends SubsystemBase {
             // Sets motor power for the motor group (which is the same doing it individually)
             jointMotors.set(power);
 
-            /* Temporary telemetry to debug effectively
+            /* Temporary telemetry to debug effectively */
             telemetry.addData("Target angle", clampedAngle);
-            telemetry.addData("Total distance to move", setpointTicks);
-            telemetry.addData("Current Ticks", rightJointMotor.getCurrentPosition());
+            telemetry.addData("Total distance to move", Math.abs(targetAngle - jointMath.toDegrees(rightJointMotor.getCurrentPosition())));
+            telemetry.addData("Current Ticks tihh", rightJointMotor.getCurrentPosition());
             telemetry.addData("Current degree", jointMath.toDegrees(rightJointMotor.getCurrentPosition()));
             telemetry.addData("Output", output);
             telemetry.addData("Power", power);
-            telemetry.update();*/
+            telemetry.update();
         }
 
         stopMotors();
