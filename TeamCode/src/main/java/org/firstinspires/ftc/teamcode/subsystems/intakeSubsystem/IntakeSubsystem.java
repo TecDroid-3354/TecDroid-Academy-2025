@@ -40,11 +40,11 @@ public class IntakeSubsystem extends SubsystemBase {
     // Functional code //
     public void openGripper() {
         // The setPosition method sets the position of the servo to a specified, normalized location
-        gripperServo.setPosition(0.6);
+        gripperServo.setPosition(0.7);
     }
 
     public void closeGripper() {
-        gripperServo.setPosition(0.4);
+        gripperServo.setPosition(0.35);
     }
 
     public void turnWristRotator(double angle) {

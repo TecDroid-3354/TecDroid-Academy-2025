@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.humerusSubsystem.misc;
 
 public final class HumerusConstants {
     // Declaring setup constants, like IDs
-    public static final String humerusRightServoId = "rightServo";
-    public static final String humerusLeftServoId = "leftServo";
+    public static final String humerusRightServoId = "humerusRightServo";
+    public static final String humerusLeftServoId = "humerusLeftServo";
 
 
     // Declaring servo limits according to each subsystem

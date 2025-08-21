@@ -45,7 +45,7 @@ public class CMDOpMode extends CommandOpMode {
     JointSubsystem testJoint;
     SliderSubsystem testSlider;
     ArmSystem arm;
-    //IntakeSubsystem intake;
+    IntakeSubsystem intake;
 
     HumerusSubsystem humerus;
 
@@ -77,6 +77,8 @@ public class CMDOpMode extends CommandOpMode {
 
         arm = new ArmSystem(hardwareMap, telemetry);
 
+        intake = new IntakeSubsystem(hardwareMap, telemetry);
+
         humerus =  new HumerusSubsystem(hardwareMap, telemetry);
         // Configuring controller key bindings
         configureBindings();
@@ -106,24 +108,13 @@ public class CMDOpMode extends CommandOpMode {
                 // Resets the mecanum heading manually
                 mecanumSubsystem.resetHeading();
             }
-
-            /*if (controller.gamepad.a) {
-                intake.turnWristRotator(45);
-            }
-            if (controller.gamepad.b) {
+            if (gamepad1.dpad_up){
                 intake.openGripper();
             }
-            if (controller.gamepad.x) {
+            if (gamepad1.dpad_down){
                 intake.closeGripper();
-            }*/
-            /*if (controller.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
-                //Completely up
-                humerus.setAngle(-20.0);
             }
-            if (controller.getButton(GamepadKeys.Button.RIGHT_BUMPER)) {
-                //Completely down
-                humerus.setAngle(200.0);
-            }*/
+
 
             telemetry.update();
         }
@@ -144,7 +135,7 @@ public class CMDOpMode extends CommandOpMode {
         new GamepadButton(controller, GamepadKeys.Button.Y)
                 .whenPressed(new JointPosition(testJoint, 70.0));
 
-        new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+        new GamepadButton(controller, GamepadKeys.Button.   RIGHT_BUMPER)
                 .whenPressed(new HumerusPosition(humerus, -20.0));
 
         new GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
