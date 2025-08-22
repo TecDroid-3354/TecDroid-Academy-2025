@@ -114,6 +114,9 @@ public class CMDOpMode extends CommandOpMode {
             if (gamepad1.dpad_down){
                 intake.closeGripper();
             }
+            if (gamepad1.dpad_right){
+                intake.turnWristRotator(0.40);
+            }
 
 
             telemetry.update();
